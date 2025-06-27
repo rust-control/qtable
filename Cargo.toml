@@ -1,0 +1,18 @@
+[package]
+name          = "qtable"
+version       = "0.1.0"
+edition       = "2024"
+authors       = ["kanarus <kanarus786@gmail.com>"]
+documentation = "https://docs.rs/qtable"
+homepage      = "https://crates.io/crates/qtable"
+repository    = "https://github.com/kanarus/qtable"
+readme        = "README.md"
+license       = "MIT"
+description   = ""
+keywords      = []
+categories    = []
+
+[dependencies]
+serde      = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+rand       = { version = "0.9" }
