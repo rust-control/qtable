@@ -1,5 +1,6 @@
 use crate::{action::Action, state::State, value::QValue};
 
+#[derive(Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct QTable {
     /// 2D vector for Q-values, indexed by state and action
@@ -7,6 +8,7 @@ pub struct QTable {
     config: QTableConfig,
 }
 
+#[derive(Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct QTableConfig {
     /// size of the state space

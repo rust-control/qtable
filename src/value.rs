@@ -1,7 +1,7 @@
 use std::ops::Range;
 use rand::{rng, Rng, distr::Uniform};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct QValue(f64);
 
