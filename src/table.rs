@@ -5,12 +5,12 @@ use crate::{action::Action, state::State, value::QValue};
 pub struct QTable {
     /// 2D vector for Q-values, indexed by state and action
     qvalues: Vec<Vec<QValue>>,
-    config: QTableConfig,
+    config: QConfig,
 }
 
 #[derive(Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct QTableConfig {
+pub struct QConfig {
     /// size of the state space
     pub state_size: usize,
     /// size of the action space
@@ -24,7 +24,7 @@ pub struct QTableConfig {
     pub epsilon: f64,
 }
 
-impl Default for QTableConfig {
+impl Default for QConfig {
     fn default() -> Self {
         Self {
             state_size: 14,
@@ -41,7 +41,7 @@ impl QTable {
         Self::new_with(Default::default())
     }
 
-    pub fn new_with(config: QTableConfig) -> Self {
+    pub fn new_with(config: QConfig) -> Self {
         let qvalues = (0..config.state_size)
             .map(|_| QValue::random_collect(config.action_size))
             .collect();
@@ -55,7 +55,7 @@ impl QTable {
         Ok(serde_json::from_reader(reader)?)
     }
 
-    pub fn load_with(file_path: impl AsRef<std::path::Path>, config: QTableConfig) -> Result<Self, std::io::Error> {
+    pub fn load_with(file_path: impl AsRef<std::path::Path>, config: QConfig) -> Result<Self, std::io::Error> {
         let loaded = Self::load(file_path)?;
         Ok(Self { config, ..loaded })
     }
@@ -136,11 +136,11 @@ impl std::ops::Index<(State, Action)> for QTable {
     }
 }
 
-pub trait Strategy {
+pub trait QStrategy {
     fn determine(qtable: &QTable, state: State) -> Action;
 }
 
-pub struct Update {
+pub struct QUpdate {
     pub state: State,
     pub action: Action,
     pub reward: f64,
@@ -148,16 +148,16 @@ pub struct Update {
 }
 
 impl QTable {
-    pub fn next_action<S: Strategy>(&self, state: State) -> Action {
+    pub fn next_action<S: QStrategy>(&self, state: State) -> Action {
         S::determine(self, state)
     }
 
-    pub fn update(&mut self, Update {
+    pub fn update(&mut self, QUpdate {
         state,
         action,
         reward,
         next_state,
-    }: Update) {
+    }: QUpdate) {
         let current_qvalue = self.qvalues[*state][*action];
         let next_max_qvalue = self.qvalues[*next_state].iter().max().unwrap().clone();
 
@@ -168,12 +168,12 @@ impl QTable {
     }
 }
 
-pub mod strategy {
-    use super::{Strategy, Action, QTable, State};
+pub mod qstrategy {
+    use super::{QStrategy, Action, QTable, State};
     use rand::{Rng, distr::{weighted::WeightedIndex}};
 
     pub struct Explore;
-    impl Strategy for Explore {
+    impl QStrategy for Explore {
         fn determine(qtable: &QTable, state: State) -> Action {
             let max_action_qvalue = qtable[state].iter().max().unwrap();
             let candidates = qtable[state]
@@ -187,7 +187,7 @@ pub mod strategy {
     }
 
     pub struct SoftMax;
-    impl Strategy for SoftMax {
+    impl QStrategy for SoftMax {
         fn determine(qtable: &QTable, state: State) -> Action {
             let qvalues = &qtable[state];
             let max_action_qvalue = qvalues.iter().max().unwrap();
@@ -204,7 +204,7 @@ pub mod strategy {
     }
 
     pub struct EpsilonGreedy;
-    impl Strategy for EpsilonGreedy {
+    impl QStrategy for EpsilonGreedy {
         fn determine(qtable: &QTable, state: State) -> Action {
             if rand::rng().random_range(0.0..1.0) < qtable.epsilon() {
                 Random::determine(qtable, state)
@@ -215,7 +215,7 @@ pub mod strategy {
     }
 
     pub struct Random;
-    impl Strategy for Random {
+    impl QStrategy for Random {
         fn determine(qtable: &QTable, _state: State) -> Action {
             let selected_index = rand::rng().random_range(0..qtable.action_size());
             Action::new_on(qtable, selected_index).unwrap()
