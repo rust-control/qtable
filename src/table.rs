@@ -136,7 +136,7 @@ impl std::ops::Index<(State, Action)> for QTable {
     }
 }
 
-pub trait QStrategy {
+pub trait Strategy {
     fn determine(qtable: &QTable, state: State) -> Action;
 }
 
@@ -148,7 +148,7 @@ pub struct QUpdate {
 }
 
 impl QTable {
-    pub fn next_action<S: QStrategy>(&self, state: State) -> Action {
+    pub fn next_action<S: Strategy>(&self, state: State) -> Action {
         S::determine(self, state)
     }
 
@@ -168,12 +168,12 @@ impl QTable {
     }
 }
 
-pub mod qstrategy {
-    use super::{QStrategy, Action, QTable, State};
+pub mod strategy {
+    use super::{Strategy, Action, QTable, State};
     use rand::{Rng, distr::{weighted::WeightedIndex}};
 
     pub struct Explore;
-    impl QStrategy for Explore {
+    impl Strategy for Explore {
         fn determine(qtable: &QTable, state: State) -> Action {
             let max_action_qvalue = qtable[state].iter().max().unwrap();
             let candidates = qtable[state]
@@ -187,7 +187,7 @@ pub mod qstrategy {
     }
 
     pub struct SoftMax;
-    impl QStrategy for SoftMax {
+    impl Strategy for SoftMax {
         fn determine(qtable: &QTable, state: State) -> Action {
             let qvalues = &qtable[state];
             let max_action_qvalue = qvalues.iter().max().unwrap();
@@ -204,7 +204,7 @@ pub mod qstrategy {
     }
 
     pub struct EpsilonGreedy;
-    impl QStrategy for EpsilonGreedy {
+    impl Strategy for EpsilonGreedy {
         fn determine(qtable: &QTable, state: State) -> Action {
             if rand::rng().random_range(0.0..1.0) < qtable.epsilon() {
                 Random::determine(qtable, state)
@@ -215,7 +215,7 @@ pub mod qstrategy {
     }
 
     pub struct Random;
-    impl QStrategy for Random {
+    impl Strategy for Random {
         fn determine(qtable: &QTable, _state: State) -> Action {
             let selected_index = rand::rng().random_range(0..qtable.action_size());
             Action::new_on(qtable, selected_index).unwrap()
