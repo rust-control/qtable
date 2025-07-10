@@ -68,7 +68,6 @@ impl QTable {
     }
 }
 
-// config getters
 impl QTable {
     pub fn state_size(&self) -> usize {
         self.config.state_size

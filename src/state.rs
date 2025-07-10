@@ -13,4 +13,8 @@ impl State {
     pub fn new_on(qtable: &crate::QTable, index: usize) -> Option<Self> {
         (index < qtable.state_size()).then_some(Self(index))
     }
+
+    pub fn index(&self) -> usize {
+        self.0
+    }
 }

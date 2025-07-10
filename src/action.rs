@@ -10,7 +10,11 @@ impl std::ops::Deref for Action {
 }
 
 impl Action {
-    pub(crate) fn new_on(qtable: &crate::QTable, index: usize) -> Option<Self> {
+    pub fn new_on(qtable: &crate::QTable, index: usize) -> Option<Self> {
         (index < qtable.action_size()).then_some(Self(index))
+    }
+
+    pub fn index(&self) -> usize {
+        self.0
     }
 }
