@@ -55,11 +55,6 @@ impl QTable {
         Ok(serde_json::from_reader(reader)?)
     }
 
-    pub fn load_with(file_path: impl AsRef<std::path::Path>, config: QConfig) -> Result<Self, std::io::Error> {
-        let loaded = Self::load(file_path)?;
-        Ok(Self { config, ..loaded })
-    }
-
     pub fn save(&self, file_path: impl AsRef<std::path::Path>) -> Result<(), std::io::Error> {
         let file = std::fs::File::create(file_path)?;
         let writer = std::io::BufWriter::new(file);
@@ -163,7 +158,7 @@ impl QTable {
         self.qvalues[*state][*action] = QValue::new(
             (1. - self.alpha()) * (*current_qvalue)
             + self.alpha() * (reward + self.gamma() * (*next_max_qvalue)),
-        );//.expect("Invalid Q-value creation");
+        );
     }
 }
 
