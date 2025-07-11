@@ -163,7 +163,7 @@ impl QTable {
         self.qvalues[*state][*action] = QValue::new(
             (1. - self.alpha()) * (*current_qvalue)
             + self.alpha() * (reward + self.gamma() * (*next_max_qvalue)),
-        ).expect("Invalid Q-value creation");
+        );//.expect("Invalid Q-value creation");
     }
 }
 

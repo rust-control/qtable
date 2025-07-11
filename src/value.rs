@@ -1,6 +1,3 @@
-use std::ops::Range;
-use rand::{rng, Rng, distr::Uniform};
-
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct QValue(f64);
@@ -23,15 +20,11 @@ impl std::ops::Deref for QValue {
 }
 
 impl QValue {
-    pub const RANGE: Range<f64> = (-1.0)..1.0;
-
-    pub(super) fn new(value: f64) -> Option<Self> {
-        Self::RANGE.contains(&value).then_some(Self(value))
+    pub(super) fn new(value: f64) -> Self {
+        Self(value)
     }
 
     pub(super) fn random_collect(size: usize) -> Vec<Self> {
-        let uniform = Uniform::try_from(Self::RANGE).unwrap();
-        let mut rng = rng();
-        (0..size).map(|_| Self(rng.sample(uniform))).collect()
+        (0..size).map(|_| Self(rand::Rng::random(&mut rand::rng()))).collect()
     }
 }
