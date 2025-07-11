@@ -166,8 +166,8 @@ pub mod strategy {
     use super::{Strategy, Action, QTable, State};
     use rand::{Rng, distr::{weighted::WeightedIndex}};
 
-    pub struct Explore;
-    impl Strategy for Explore {
+    pub struct MostQValue;
+    impl Strategy for MostQValue {
         fn determine(qtable: &QTable, state: State) -> Action {
             let max_action_qvalue = qtable[state].iter().max().unwrap();
             let candidates = qtable[state]
@@ -186,9 +186,7 @@ pub mod strategy {
             let qvalues = &qtable[state];
             let max_action_qvalue = qvalues.iter().max().unwrap();
             let softmax_probabilities = {
-                let exp = qvalues.iter()
-                    .map(|q| (**q - **max_action_qvalue).exp())
-                    .collect::<Vec<_>>();
+                let exp = qvalues.iter().map(|q| (**q - **max_action_qvalue).exp()).collect::<Vec<_>>();
                 let exp_sum = exp.iter().sum::<f64>();
                 exp.iter().map(|&e| e / exp_sum).collect::<Vec<_>>()
             };
@@ -203,7 +201,7 @@ pub mod strategy {
             if rand::rng().random_range(0.0..1.0) < qtable.epsilon() {
                 Random::determine(qtable, state)
             } else {
-                Explore::determine(qtable, state)
+                MostQValue::determine(qtable, state)
             }
         }
     }
