@@ -80,6 +80,17 @@ impl QTable {
     pub fn epsilon(&self) -> f64 {
         self.config.epsilon
     }
+
+    /// Sets alpha to `alpha * rate`.
+    /// This is useful for decay strategies where you want to reduce the learning rate over time.
+    pub fn decay_alpha_with_rate(&mut self, rate: f64) {
+        self.config.alpha = self.config.alpha * rate;
+    }
+    /// Sets epsilon to `epsilon * rate`.
+    /// This is useful for decay strategies where you want to reduce the exploration rate over time.
+    pub fn decay_epsilon_with_rate(&mut self, rate: f64) {
+        self.config.epsilon = self.config.epsilon * rate;
+    }
 }
 
 impl QTable {
@@ -156,8 +167,7 @@ impl QTable {
         let next_max_qvalue = self.qvalues[*next_state].iter().max().unwrap().clone();
 
         self.qvalues[*state][*action] = QValue::new(
-            (1. - self.alpha()) * (*current_qvalue)
-            + self.alpha() * (reward + self.gamma() * (*next_max_qvalue)),
+            (1. - self.alpha()) * (*current_qvalue) + self.alpha() * (reward + self.gamma() * (*next_max_qvalue)),
         );
     }
 }
