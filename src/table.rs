@@ -70,6 +70,13 @@ impl QTable {
     pub fn action_size(&self) -> usize {
         self.config.action_size
     }
+    
+    pub fn pick_state(&self, index: usize) -> Option<State> {
+        State::new_on(self, index).ok()
+    }
+    pub fn pick_action(&self, index: usize) -> Option<Action> {
+        Action::new_on(self, index).ok()
+    }
 
     pub fn gamma(&self) -> f64 {
         self.config.gamma

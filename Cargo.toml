@@ -8,9 +8,9 @@ homepage      = "https://crates.io/crates/qtable"
 repository    = "https://github.com/kanarus/qtable"
 readme        = "README.md"
 license       = "MIT"
-description   = ""
-keywords      = []
-categories    = []
+description   = "A simple Q-Table implementation for Rust"
+keywords      = ["q-table", "rl", "reinforcement-learning", "machine-learning", "q-learning"]
+categories    = ["sience", "simulation"]
 
 [dependencies]
 serde      = { version = "1.0", features = ["derive"] }
